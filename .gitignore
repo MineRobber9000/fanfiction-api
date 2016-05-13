@@ -1,0 +1,8 @@
+.idea/
+*.pyc
+test.*
+test*.py
+captcha.jpg
+build/
+dist/
+fanfiction_api.egg-info
