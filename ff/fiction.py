@@ -1,7 +1,8 @@
-import re, requests, bs4, unicodedata
+import re, urllib2, bs4, unicodedata
 from datetime import timedelta, date
 import ff
 # Constants
+opener = urllib2.urlopen
 root = 'https://www.fanfiction.net'
 
 # REGEX MATCHES
@@ -114,8 +115,7 @@ class Story(object):
             else:
                 url = _STORY_URL_TEMPLATE % int(id)
 
-        source = requests.get(url)
-        source = source.text
+        source = opener(url).read()
         # Easily parsable and directly contained in the JavaScript, lets hope
         # that doesn't change or it turns into something like below
         self.id = _parse_integer(_STORYID_REGEX, source)
@@ -243,8 +243,7 @@ class Chapter(object):
             elif story_id and chapter:
                 url = _CHAPTER_URL_TEMPLATE % (story_id, chapter)
 
-        source = requests.get(url)
-        source = source.text
+        source = opener(url).read()
         self.story_id = _parse_integer(_STORYID_REGEX, source)
         self.number = _parse_integer(_CHAPTER_REGEX, source)
         self.story_text_id = _parse_integer(_STORYTEXTID_REGEX, source)
@@ -287,8 +286,7 @@ class User(object):
         else:
             self.userid = _parse_integer(_USERID_URL_EXTRACT, url)
 
-        source = requsts.get(url)
-        source = source.text
+        source = opener(url).read()
         self._soup = bs4.BeautifulSoup(source, 'html5lib')
         self.url = url
         self.username = _parse_string(_USERNAME_REGEX, source)
@@ -303,8 +301,7 @@ class User(object):
         Get the stories written by this author.
         :return: A generator for stories by this author.
         """
-        xml_page_source = requests.get(root + '/atom/u/%d/' % self.userid)
-        xml_page_source = xml_page_source.text
+        xml_page_source = opener(root + '/atom/u/%d/' % self.userid).read()
         xml_soup = bs4.BeautifulSoup(xml_page_source)
         entries = xml_soup.findAll('link', attrs={'rel': 'alternate'})
         for entry in entries:

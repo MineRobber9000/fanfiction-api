@@ -1,33 +1,21 @@
 __author__ = 'Samson Danziger'
 
-from weasyprint import HTML
+import pdfkit
 from ebooklib import epub
 import tempfile
 import os, shutil
-import codecs
 
 root = "https://www.fanfiction.net"
-
-def _get_download_name(story):
-    s = "%s_by_%s" % (story.title, story.author)
-    s = s.replace(' ', '-')
-    return s
-
-
-def _add_extension(name, ext):
-    if not name.endswith('.%s' % (ext)):
-        name += '.%s' % (ext)
-    return name
-
-
 
 def download_pdf(story, output='', message=True):
     """ Download a story to pdf.
     :type message: bool
     """
     if output == '':
-        output = _get_download_name(story)
-    output = _add_extension(output, 'pdf')
+        output = "%s_by_%s" % (story.title, story.author)
+        output = output.replace(' ', '-')
+    if output[-4:].lower() != ".pdf":  # output should be a pdf file
+        output += ".pdf"
     if message:
         print 'Downloading \'%s\' to %s...' % (story.title, output)
     html = ''
@@ -39,22 +27,17 @@ def download_pdf(story, output='', message=True):
         html += '</br>' * 10
     if message:
         print 'Compiling PDF...'
-
-    # This turned out not to work on the command line as it needed an X interface.
-    #pdfkit.from_string(html, output)
-    # Instead trying with weasyprint
-    content = unicode(html.strip(codecs.BOM_UTF8), 'utf-8')
-    h = HTML(content)
-    h.write_pdf(output)
-    
+    pdfkit.from_string(html, output)
 
 def download_epub(story, output='', message=True):
     """ Download a story to ePub.
     :type message: bool
     """
     if output == '':
-        output = _get_download_name(story)
-    output = _add_extension(output, 'epub')
+        output = "%s_by_%s" % (story.title, story.author)
+        output = output.replace(' ', '-')
+    if output[-5:].lower() != ".epub":
+        output += ".epub"
     if message:
         print 'Downloading \'%s\' to %s...' % (story.title, output)
     # actual book build
@@ -92,8 +75,10 @@ def download_epub(story, output='', message=True):
 
 def download_mobi(story, output='', message=True):
     if output == '':
-        output = _get_download_name(story)
-    output = _add_extension(output, 'mobi')
+        output = "%s_by_%s" % (story.title, story.author)
+        output = output.replace(' ', '-')
+    if output[-5:].lower() != ".mobi":
+        output += ".mobi"
     temp_storage = tempfile.gettempdir()
     current = os.system('pwd')
     download_epub(story, '%s/temp.epub' % (temp_storage), message)
@@ -106,8 +91,10 @@ def download_mobi(story, output='', message=True):
 
 def download_txt(story, output='', message=True):
     if output == '':
-        output = _get_download_name(story)
-    output = _add_extension(output, 'txt')
+        output = "%s_by_%s" % (story.title, story.author)
+        output = output.replace(' ', '-')
+    if output[-5:].lower() != ".txt":
+        output += ".txt"
     text = ''
     for chapter in story.get_chapters():
         if message:
@@ -125,18 +112,15 @@ def download_txt(story, output='', message=True):
 
 
 def download(story, output='', message=True, ext=''):
-    try:
-        ext = ext.lower()
-        output = '%s.%s' % (output, ext)
-        if ext == 'pdf':
-            download_pdf(story, output, message)
-        elif ext == 'epub':
-            download_epub(story, output, message)
-        elif ext == 'mobi':
-            download_mobi(story, output, message)
-        elif ext == 'txt' or ext == 'text':
-            download_txt(story, output, message)
-        else:
-            print 'That functionality does not yet exist.'
-    except KeyboardInterrupt:
-        print 'Stopping download.'
+    ext = ext.lower()
+    output = '%s.%s' % (output, ext)
+    if ext == 'pdf':
+        download_pdf(story, output, message)
+    elif ext == 'epub':
+        download_epub(story, output, message)
+    elif ext == 'mobi':
+        download_mobi(story, output, message)
+    elif ext == 'txt' or ext == 'text':
+        download_txt(story, output, message)
+    else:
+        print 'That functionality does not yet exist.'

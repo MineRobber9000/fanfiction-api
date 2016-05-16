@@ -13,5 +13,6 @@ setup(name='fanfiction-api',
           'pdfkit',
           'beautifulsoup4',
           'Ebooklib',
-          'requests'
+          'requests',
+          'weasyprint'
       ])
