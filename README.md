@@ -1,5 +1,11 @@
 # FanFiction.net API
 
+Based on [jabagawee's fanfiction api][source].
+
+[source]: https://github.com/jabagawee/FanFiction.Net-API
+
+Had big problems with git, then ended up with me losing all history, until I find my other machine. 
+
 ## Features
 * Gather story, chapter and user information
 * Download stories to pdf, epub, mobi and txt
