@@ -15,4 +15,9 @@ setup(name='fanfiction-api',
           'Ebooklib',
           'requests',
           'weasyprint'
-      ])
+      ],
+      entry_points={
+          'console_scripts': [
+              'ffdownload=ff.console:ffdownload',
+          ],
+      })
